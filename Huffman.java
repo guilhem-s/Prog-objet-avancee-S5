@@ -1,6 +1,5 @@
 package huffman;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 
@@ -17,7 +16,7 @@ public class Huffman {
 
 	private Map<Character, Integer> compteCaracteres(String texte) {
 		int count;
-		Map<Character, Integer> dictionnaire = new TreeMap<>();
+		Map<Character, Integer> occurrences = new TreeMap<>();
 		char c;
 		int i;
 		while(texte.length() != 0) {	 
@@ -30,32 +29,25 @@ public class Huffman {
 					count++;
 					texte = texte.substring(0, i) + texte.substring(i+1);
 				} else i++;
-				dictionnaire.put(c, count);}}
-		return dictionnaire;}
-	
-	
-	private PriorityQueue<Noeud> initFilePrioritaire(Map<Character, Integer> occurrences) {
-        PriorityQueue<Noeud> filePrioritaire = new PriorityQueue<>();
-        for (Map.Entry<Character, Integer> entry : occurrences.entrySet()) {
-            filePrioritaire.add(new Feuille(entry.getKey(), entry.getValue()));
-        }
-        return filePrioritaire;
-    }
+				occurrences.put(c, count);}}
+		return occurrences;
+		}
+
 	
 	
 	public void initArbre(Map<Character, Integer> occurrences) {
-        PriorityQueue<NoeudArbre> filePrioritaire = initFilePrioritaire(occurrences);
-
-        // Construction de l'arbre de Huffman
-        while (filePrioritaire.size() > 1) {
-            NoeudAbstrait gauche = filePrioritaire.poll();
-            NoeudAbstrait droite = filePrioritaire.poll();
-            NoeudAbstrait nouveauNoeud = new Noeud(gauche, droite);
-            filePrioritaire.add(nouveauNoeud);
-        }
-
-        // L'arbre est le seul élément restant dans la file de priorité
-        this.arbre = filePrioritaire.poll();
+		ListeTriee liste = new ListeTriee();
+		for(Character c : occurrences.keySet()) {
+			liste.add(new Feuille(c, occurrences.get(c)));
+		}
+		while(liste.size() != 1) {
+			NoeudAbstrait a = liste.get(0);
+			NoeudAbstrait b = liste.get(1);
+			int poids = a.getPoids() + b.getPoids();
+			Noeud n = new Noeud(poids, a, b);
+			liste.remove(a); liste.remove(b);
+			liste.add(n);			
+		}
 	}
 
 	private void initDictionnaire() {}
